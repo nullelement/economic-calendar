@@ -14,6 +14,19 @@ import datetime as DT
 import arrow 
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
+from pathlib import Path
+import os
+
+source_path = Path(__file__).resolve()
+source_dir = source_path.parent
+data_dir = source_dir.parent.joinpath('data/')
+html_table_path = data_dir.joinpath("calendario.html")
+csv_table_path = data_dir.joinpath("calendario.csv")
+
+if not os.path.exists(data_dir):
+    os.mkdir(data_dir)
+
 
 def calendario(url): 
     
@@ -92,6 +105,9 @@ print('')
 
 quantidade = (len(dados) / 6) # quantidade de noticias
 
+noticia_list = []
+noticias_list = []
+
 while True:
    
     horario = dados[0] # dado especifico para o horario da 
@@ -108,6 +124,9 @@ while True:
     \nPara ver mais acesse: {link}\
     \n').strip() # noticia formatada 
 
+    noticia_list = [pais, horario, impacto, chamada, link]
+    noticias_list.append(noticia_list)
+
     print(noticia)
     print('')
 
@@ -123,3 +142,11 @@ while True:
         pass
     
 # uso dos dados em html tratados em variaveis <--
+
+# Cria um dataframe e exporta os resultados.
+nomes_colunas = ['País', 'Horário', 'Impacto', 'Evento', 'Link']
+df = pd.DataFrame(data=noticias_list, columns=nomes_colunas)
+print(df)
+df.to_html(html_table_path)
+df.to_csv(csv_table_path)
+
